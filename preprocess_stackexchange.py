@@ -96,6 +96,8 @@ for index in range(0, cur_size):
     df_entry={"qid1":id1, "question1": body1,"qid2":id2, "question2": body2, "is_duplicate":0}
     combined_df=combined_df.append(df_entry, ignore_index=True)
 print("Current size",combined_df.shape)
-combined_df.to_csv('stack_exchange.csv')
+with open('stack_exchange.csv', 'a') as f:
+    combined_df.to_csv(f)
+#combined_df.to_csv('stack_exchange.csv')
     #print(post1)
     #body1=post1["Body"]
