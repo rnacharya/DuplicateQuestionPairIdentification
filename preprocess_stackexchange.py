@@ -19,11 +19,12 @@ def strip_tags(html):
     s.feed(html)
     return s.get_data()
 
-xtree = et.parse("/Users/rachananarayanacharya/Downloads/Posts.xml")
+xtree = et.parse("/Users/rachananarayanacharya/Downloads/AskUbuntu/Posts 2.xml")
 xroot = xtree.getroot()
 
 df_cols = ["Id", "PostTypeId","Body", "Title"]
 rows = []
+max_count=17500
 
 for node in xroot:
     #print(node.attrib.get("Title"))
@@ -37,6 +38,7 @@ for node in xroot:
     rows.append({"Id": id, "PostTypeId": pid,
                  "Body": body, "Title": title})
 
+
 #print(rows)
 
 posts = pd.DataFrame(rows, columns = df_cols)
@@ -48,17 +50,19 @@ posts["Body"]=posts["Title"]+posts["Body"]
 #print(posts["Id"].head(5))
 
 
-xtree = et.parse("/Users/rachananarayanacharya/Downloads/PostLinks.xml")
+xtree = et.parse("/Users/rachananarayanacharya/Downloads/AskUbuntu/PostLinks 2.xml")
 xroot = xtree.getroot()
 
 df_cols = ["PostId", "RelatedPostId"]
 rows = []
+
 
 for node in xroot:
     id = node.attrib.get("PostId")
     rid = node.attrib.get("RelatedPostId")
 
     rows.append({"PostId": id, "RelatedPostId": rid})
+
 
 postLinks = pd.DataFrame(rows, columns = df_cols)
 merged_inner=pd.merge(left=posts,right=postLinks, left_on='Id', right_on='PostId')
@@ -71,14 +75,14 @@ combined_df.rename(columns={"PostId":"qid1", "Body_x": "question1", "RelatedPost
 combined_df.index.names = ['id']
 combined_df["is_duplicate"]=1
 combined_df=combined_df[["qid1", "qid2", "question1", "question2", "is_duplicate"]]
+combined_df=combined_df.iloc[:max_count]
+print("Got DF with just duplicate pairs of size: ", combined_df.size)
 #print("hii ",combined_df.shape)
 #print("hii-1 ",combined_df.head())
 # print("hii-1 ",combined_df[1])
 
 pairs_set=set()
 for idx, row in combined_df.iterrows():
-    #print("hey", row)
-    # print("hey1 ", row['qid1'])
 
     q1=row['qid1']
     q2=row['qid2']
@@ -112,7 +116,7 @@ for index in range(0, cur_size):
     df_entry={"qid1":id1, "question1": body1,"qid2":id2, "question2": body2, "is_duplicate":0}
     combined_df=combined_df.append(df_entry, ignore_index=True)
 print("Current size",combined_df.shape)
-with open('stack_exchange.csv', 'a') as f:
+with open('ask_ubuntu.csv', 'a') as f:
     combined_df.to_csv(f)
 
 #combined_df.to_csv('stack_exchange.csv')
