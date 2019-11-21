@@ -99,12 +99,16 @@ print("initial rows:", cur_size)
 
 for index in range(0, cur_size):
     qpair=""
+    if index%1000==0:
+        print("Reached :", index)
+    print()
     while(True):
         id1=combined_df.iloc[randint(0, cur_size-1)].loc["qid1"]#["qid1"]
         id2=combined_df.iloc[randint(0, cur_size-1)].loc["qid2"]
         qpair=str(id1)+" "+str(id2)
         if(not qpair in pairs_set and (not id1==id2)):
             break
+
     #print(qpair)
 
     post1=posts.loc[posts['Id'] == id1]
